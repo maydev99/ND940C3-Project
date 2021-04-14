@@ -85,6 +85,10 @@ class LoadingButton @JvmOverloads constructor(
 
     }
 
+    fun setLoadingButtonState(state: ButtonState) {
+        buttonState = state
+    }
+
     override fun performClick(): Boolean {
         super.performClick()
         Log.i("TAG", "Click")
@@ -168,5 +172,7 @@ class LoadingButton @JvmOverloads constructor(
         heightSize = h
         setMeasuredDimension(w, h)
     }
+
+
 
 }
