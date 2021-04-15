@@ -16,9 +16,6 @@
     <string name="load_app_text">LoadApp - Current repository by Udacity</string>
     <string name="retrofit_text">Retrofit - Type-safe HTTP client for Android and Java by Square, Inc</string>
 
-    <!--<string name="glide_url">https://github.com/bumptech/glide</string>
-    <string name="load_url">https://github.com/udacity/nd940-c3-advanced-android-programming-project-starter</string>
-    <string name="retrofit_url">https://github.com/square/retrofit</string>-->
 
     <string name="download">Download</string>
     <string name="view_download_status">View Download Status</string>
@@ -26,4 +23,8 @@
     <string name="download_notification_channel_name">Downloads</string>
     <string name="no_repository_selected">No Repository Selected</string>
     <string name="download_is_ready">Download is Ready</string>
+    <string name="ok">OK</string>
+    <string name="status">Status:</string>
+    <string name="file_name">File name:</string>
+    <string name="success">Success</string>
 </resources>
