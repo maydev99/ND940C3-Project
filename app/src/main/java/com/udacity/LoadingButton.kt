@@ -1,5 +1,6 @@
 package com.udacity
 
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
@@ -10,6 +11,7 @@ import android.util.Log
 import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.core.content.withStyledAttributes
+import com.udacity.util.NoRepositorySelected
 import kotlin.properties.Delegates
 
 class LoadingButton @JvmOverloads constructor(
@@ -20,17 +22,11 @@ class LoadingButton @JvmOverloads constructor(
     private var valueAnimator = ValueAnimator()
     private var progress = 0
     private var loadingColor = 0
-    private var radius = 25.0f
 
-    private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
-        when(new) {
+
+    private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { _, _, new ->
+        when (new) {
             ButtonState.Completed -> {
-                valueAnimator.cancel()
-                invalidate()
-                requestLayout()
-            }
-
-            ButtonState.Loading -> {
                 valueAnimator.cancel()
                 invalidate()
                 requestLayout()
@@ -42,12 +38,11 @@ class LoadingButton @JvmOverloads constructor(
                 requestLayout()
             }
 
-            ButtonState.Default -> {
-                valueAnimator.cancel()
+            ButtonState.Loading -> {
+                valueAnimator.start()
                 invalidate()
                 requestLayout()
             }
-
 
         }
     }
@@ -69,10 +64,11 @@ class LoadingButton @JvmOverloads constructor(
             buttonColor = getColor(R.styleable.LoadingButton_buttonColor, 0)
             loadingColor = getColor(R.styleable.LoadingButton_loadingButtonColor, 0)
             val backgroundColor = getColor(R.styleable.LoadingButton_backgroundColor, 0)
+
         }
 
         valueAnimator = ValueAnimator.ofInt(0, 100).apply {
-            duration = 2000
+            duration = 3000
             interpolator = LinearInterpolator()
             addUpdateListener {
                 progress = this.animatedValue as Int
@@ -81,7 +77,7 @@ class LoadingButton @JvmOverloads constructor(
             }
         }
 
-        buttonState = ButtonState.Default
+        buttonState = ButtonState.Completed
 
     }
 
@@ -91,36 +87,35 @@ class LoadingButton @JvmOverloads constructor(
 
     override fun performClick(): Boolean {
         super.performClick()
-        Log.i("TAG", "Click")
+        //Log.i("TAG", "Click")
         buttonState = ButtonState.Clicked
         return true
     }
-
-
 
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
         when (buttonState) {
+
+
+            ButtonState.Clicked -> {
+                drawLoadingButton(canvas)
+                drawText(resources.getString(R.string.button_loading), canvas)
+
+            }
+
             ButtonState.Completed -> {
-            drawDefaultButton(canvas)
-                drawText(resources.getString(R.string.download),canvas)
+                drawDefaultButton(canvas)
+                drawText(resources.getString(R.string.download), canvas)
+
             }
 
             ButtonState.Loading -> {
 
             }
 
-            ButtonState.Clicked -> {
-               drawLoadingButton(canvas)
-                drawText(resources.getString(R.string.button_loading), canvas)
-            }
 
-            ButtonState.Default -> {
-                drawDefaultButton(canvas)
-                drawText(resources.getString(R.string.download), canvas)
-            }
         }
 
 
@@ -130,19 +125,27 @@ class LoadingButton @JvmOverloads constructor(
         paint.color = buttonColor
         canvas.drawRect(0f, 0f, widthSize.toFloat(), heightSize.toFloat(), paint)
         paint.color = loadingColor
-        canvas.drawRect(0f, 0f, (widthSize * (progress.toDouble() / 100)).toFloat(), heightSize.toFloat(), paint)
+        canvas.drawRect(
+            0f,
+            0f,
+            (widthSize * (progress.toDouble() / 100)).toFloat(),
+            heightSize.toFloat(),
+            paint
+        )
 
         // Draw Arc
         paint.color = Color.YELLOW
         canvas.drawArc(
             widthSize - 170.toFloat(),
-            10.0f, widthSize -30.toFloat(),
+            10.0f, widthSize - 30.toFloat(),
             heightSize - 10.toFloat(),
             360f,
             (360f * progress.toDouble() / 100).toFloat(),
             true,
             paint
         )
+
+
     }
 
     private fun drawDefaultButton(canvas: Canvas) {
@@ -172,7 +175,6 @@ class LoadingButton @JvmOverloads constructor(
         heightSize = h
         setMeasuredDimension(w, h)
     }
-
 
 
 }

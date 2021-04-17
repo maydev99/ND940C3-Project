@@ -14,7 +14,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.udacity.util.sendNotification
 import kotlinx.android.synthetic.main.activity_main.*
@@ -22,7 +21,7 @@ import kotlinx.android.synthetic.main.content_main.*
 import java.io.File
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private var downloadID: Long = 0
     private lateinit var notificationManager: NotificationManager
@@ -40,32 +39,38 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
         loadingButton = findViewById(R.id.custom_button)
-
+        loadingButton.setLoadingButtonState(ButtonState.Completed)
 
         custom_button.setOnClickListener {
             when {
                 radio_button_glide.isChecked -> {
                     repositoryDescription = getString(R.string.glide_text)
+                    custom_button.isEnabled = false
                     download(GLIDE_URL)
                 }
 
                 radio_button_load.isChecked -> {
                     repositoryDescription = getString(R.string.load_app_text)
+                    custom_button.isEnabled = false
                     download(LOAD_APP_URL)
                 }
 
                 radio_button_retrofit.isChecked -> {
+
                     repositoryDescription = getString(R.string.retrofit_text)
+                    custom_button.isEnabled = false
                     download(RETROFIT_URL)
                 }
 
                 else -> {
-                    loadingButton.setLoadingButtonState(ButtonState.Completed)
-                    Toast.makeText(
-                        this,
-                        getString(R.string.no_repository_selected),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    if (isAppInForeground) {
+                        Toast.makeText(
+                            this,
+                            getString(R.string.no_repository_selected),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
                 }
             }
         }
@@ -79,29 +84,38 @@ class MainActivity : AppCompatActivity() {
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-           // val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
+            val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
 
-            val query = downloadManager.query(DownloadManager.Query().setFilterById(downloadID))
-            if (query.moveToFirst()) {
+            if (id != null) {
+                val query = downloadManager.query(DownloadManager.Query().setFilterById(downloadID))
+                if (query.moveToFirst()) {
 
-                when (query.getInt(query.getColumnIndex(DownloadManager.COLUMN_STATUS))) {
-                    DownloadManager.STATUS_FAILED -> {
-                        Log.i("TAG", "Download Failed")
-                        downloadState = false
+                    when (query.getInt(query.getColumnIndex(DownloadManager.COLUMN_STATUS))) {
+                        DownloadManager.STATUS_FAILED -> {
+                            Log.i("TAG", "Download Failed")
+                            downloadState = false
+                            custom_button.isEnabled = true
 
+                        }
+
+                        DownloadManager.STATUS_SUCCESSFUL -> {
+                            Log.i("TAG", "Download Successful")
+                            if (isAppInForeground) {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    "Download Complete",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            downloadState = true
+                            custom_button.isEnabled = true
+                        }
                     }
 
-                    DownloadManager.STATUS_SUCCESSFUL -> {
-                        Log.i("TAG", "Download Successful")
-                        Toast.makeText(this@MainActivity, "Download Complete", Toast.LENGTH_SHORT).show()
-                        downloadState = true
-                    }
+                    sendNotification()
+                    query.close()
                 }
-
-                sendNotification()
-                query.close()
             }
-
         }
     }
 
