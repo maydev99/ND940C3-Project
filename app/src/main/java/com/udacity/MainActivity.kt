@@ -1,6 +1,5 @@
 package com.udacity
 
-import android.app.AlertDialog
 import android.app.DownloadManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -10,7 +9,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -40,8 +38,10 @@ class MainActivity : BaseActivity() {
         loadingButton = findViewById(R.id.custom_button)
         loadingButton.setLoadingButtonState(ButtonState.Completed)
 
+        //Handle Custom Button Clicks (Loading Button)
+
         custom_button.setOnClickListener {
-            
+
             if (!isConnected(this)) {
                 showConnectionDialog()
             }
@@ -92,7 +92,7 @@ class MainActivity : BaseActivity() {
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
-
+            downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
             if (id != null) {
                 val query = downloadManager.query(DownloadManager.Query().setFilterById(downloadID))
                 if (query.moveToFirst()) {
@@ -110,7 +110,7 @@ class MainActivity : BaseActivity() {
                             if (isAppInForeground) {
                                 Toast.makeText(
                                     this@MainActivity,
-                                    "Download Complete",
+                                    getString(R.string.download_complete),
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
@@ -186,7 +186,7 @@ class MainActivity : BaseActivity() {
                 setShowBadge(false)
 
                 enableLights(true)
-                lightColor = Color.RED
+                lightColor = Color.BLUE
                 enableVibration(true)
                 description = getString(R.string.notification_description)
             }
@@ -197,23 +197,5 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun showConnectionDialog() {
-        if (isAppInForeground) {
-            val connectionAlert = AlertDialog.Builder(this)
-            connectionAlert.apply {
-                setTitle(getString(R.string.no_internet_connection))
-                setMessage("Your file will download once your internet connection is restored")
-                setIcon(R.drawable.ic_baseline_signal_wifi_connected_no_internet_4_24)
-                setPositiveButton(getString(R.string.close)) { _, _ ->
-                    //Closes Dialog
-                }
-                setNegativeButton(getString(R.string.settings)) { _, _ ->
-                    val intent = Intent(Settings.ACTION_DATA_ROAMING_SETTINGS)
-                    context.startActivity(intent)
-                }
-                show()
-            }
-        }
-    }
 
 }

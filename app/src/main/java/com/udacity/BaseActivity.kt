@@ -1,9 +1,12 @@
 package com.udacity
 
 
+import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 
@@ -52,6 +55,25 @@ open class BaseActivity : AppCompatActivity() {
             }
         }
         return false
+    }
+
+    fun showConnectionDialog() {
+        if (isAppInForeground) {
+            val connectionAlert = AlertDialog.Builder(this)
+            connectionAlert.apply {
+                setTitle(getString(R.string.no_internet_connection))
+                setMessage(getString(R.string.connection_dialog_message))
+                setIcon(R.drawable.ic_baseline_signal_wifi_connected_no_internet_4_24)
+                setPositiveButton(getString(R.string.close)) { _, _ ->
+                    //Closes Dialog
+                }
+                setNegativeButton(getString(R.string.settings)) { _, _ ->
+                    val intent = Intent(Settings.ACTION_DATA_ROAMING_SETTINGS)
+                    context.startActivity(intent)
+                }
+                show()
+            }
+        }
     }
 
 }
