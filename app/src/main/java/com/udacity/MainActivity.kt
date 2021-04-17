@@ -47,12 +47,14 @@ class MainActivity : BaseActivity() {
                     repositoryDescription = getString(R.string.glide_text)
                     custom_button.isEnabled = false
                     download(GLIDE_URL)
+                    loadingButton.onClickButton()
                 }
 
                 radio_button_load.isChecked -> {
                     repositoryDescription = getString(R.string.load_app_text)
                     custom_button.isEnabled = false
                     download(LOAD_APP_URL)
+                    loadingButton.onClickButton()
                 }
 
                 radio_button_retrofit.isChecked -> {
@@ -60,6 +62,7 @@ class MainActivity : BaseActivity() {
                     repositoryDescription = getString(R.string.retrofit_text)
                     custom_button.isEnabled = false
                     download(RETROFIT_URL)
+                    loadingButton.onClickButton()
                 }
 
                 else -> {
@@ -137,8 +140,6 @@ class MainActivity : BaseActivity() {
     }
 
     private fun download(url: String) {
-
-        loadingButton.setLoadingButtonState(ButtonState.Loading)
         val file = File(getExternalFilesDir(null), "/repo_download")
 
         if (!file.exists()) {

@@ -7,11 +7,9 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.view.animation.LinearInterpolator
 import androidx.core.content.withStyledAttributes
-import com.udacity.util.NoRepositorySelected
 import kotlin.properties.Delegates
 
 class LoadingButton @JvmOverloads constructor(
@@ -63,13 +61,13 @@ class LoadingButton @JvmOverloads constructor(
             textColor = getColor(R.styleable.LoadingButton_textColor, 0)
             buttonColor = getColor(R.styleable.LoadingButton_buttonColor, 0)
             loadingColor = getColor(R.styleable.LoadingButton_loadingButtonColor, 0)
-            val backgroundColor = getColor(R.styleable.LoadingButton_backgroundColor, 0)
 
         }
 
         valueAnimator = ValueAnimator.ofInt(0, 100).apply {
             duration = 3000
             interpolator = LinearInterpolator()
+            repeatCount = ObjectAnimator.INFINITE
             addUpdateListener {
                 progress = this.animatedValue as Int
                 invalidate()
@@ -85,11 +83,8 @@ class LoadingButton @JvmOverloads constructor(
         buttonState = state
     }
 
-    override fun performClick(): Boolean {
-        super.performClick()
-        //Log.i("TAG", "Click")
+    fun onClickButton() {
         buttonState = ButtonState.Clicked
-        return true
     }
 
 
@@ -112,7 +107,8 @@ class LoadingButton @JvmOverloads constructor(
             }
 
             ButtonState.Loading -> {
-
+                drawLoadingButton(canvas)
+                drawText(resources.getString(R.string.button_loading), canvas)
             }
 
 
