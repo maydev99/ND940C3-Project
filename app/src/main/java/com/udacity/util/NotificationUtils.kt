@@ -13,7 +13,7 @@ import com.udacity.R
 const val NOTIFICATION_ID = 0
 
 fun NotificationManager.sendNotification(
-    messageBody: String,
+    //messageBody: String,
     applicationContext: Context,
     repositoryDescription: String,
     downloadState: Boolean

@@ -1,17 +1,16 @@
 package com.udacity
 
+import android.app.AlertDialog
 import android.app.DownloadManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -42,6 +41,11 @@ class MainActivity : BaseActivity() {
         loadingButton.setLoadingButtonState(ButtonState.Completed)
 
         custom_button.setOnClickListener {
+            
+            if (!isConnected(this)) {
+                showConnectionDialog()
+            }
+
             when {
                 radio_button_glide.isChecked -> {
                     repositoryDescription = getString(R.string.glide_text)
@@ -129,7 +133,6 @@ class MainActivity : BaseActivity() {
         ) as NotificationManager
 
         notificationManager.sendNotification(
-            getString(R.string.notification_description),
             applicationContext,
             repositoryDescription,
             downloadState
@@ -191,6 +194,25 @@ class MainActivity : BaseActivity() {
             val notificationManager =
                 getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(notificationChannel)
+        }
+    }
+
+    private fun showConnectionDialog() {
+        if (isAppInForeground) {
+            val connectionAlert = AlertDialog.Builder(this)
+            connectionAlert.apply {
+                setTitle(getString(R.string.no_internet_connection))
+                setMessage("Your file will download once your internet connection is restored")
+                setIcon(R.drawable.ic_baseline_signal_wifi_connected_no_internet_4_24)
+                setPositiveButton(getString(R.string.close)) { _, _ ->
+                    //Closes Dialog
+                }
+                setNegativeButton(getString(R.string.settings)) { _, _ ->
+                    val intent = Intent(Settings.ACTION_DATA_ROAMING_SETTINGS)
+                    context.startActivity(intent)
+                }
+                show()
+            }
         }
     }
 
