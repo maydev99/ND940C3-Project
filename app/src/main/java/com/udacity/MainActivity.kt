@@ -8,14 +8,12 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.udacity.util.sendNotification
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
-import java.io.File
 
 
 class MainActivity : BaseActivity() {
@@ -138,16 +136,15 @@ class MainActivity : BaseActivity() {
             downloadState
         )
 
+
+
         radio_group.clearCheck()
         loadingButton.setLoadingButtonState(ButtonState.Completed)
     }
 
-    private fun download(url: String) {
-        val file = File(getExternalFilesDir(null), "/repo_download")
 
-        if (!file.exists()) {
-            file.mkdirs()
-        }
+    private fun download(url: String) {
+
 
         val request =
             DownloadManager.Request(Uri.parse(url))
@@ -156,10 +153,6 @@ class MainActivity : BaseActivity() {
                 .setRequiresCharging(false)
                 .setAllowedOverMetered(true)
                 .setAllowedOverRoaming(true)
-                .setDestinationInExternalPublicDir(
-                    Environment.DIRECTORY_DOWNLOADS,
-                    "/repo_download/download.zip"
-                )
 
         downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
         downloadID =
@@ -197,5 +190,14 @@ class MainActivity : BaseActivity() {
         }
     }
 
+
+    /**
+     * Unregistering receiver in onDestroy allows
+     * the file to finish download when app is not in-focus
+     */
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(receiver)
+    }
 
 }

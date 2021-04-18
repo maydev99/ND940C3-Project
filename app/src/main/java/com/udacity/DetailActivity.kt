@@ -1,5 +1,6 @@
 package com.udacity
 
+import android.app.NotificationManager
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -16,6 +17,11 @@ class DetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
         setSupportActionBar(toolbar)
+
+
+        //Cancels Notification
+        val notificationManager = this.getSystemService(NotificationManager::class.java)
+        notificationManager.cancelAll()
 
 
         val bundle = intent.extras

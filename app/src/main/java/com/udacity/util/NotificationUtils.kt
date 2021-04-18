@@ -8,23 +8,32 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.core.app.NotificationCompat
 import com.udacity.DetailActivity
+import com.udacity.MainActivity
 import com.udacity.R
 
 const val NOTIFICATION_ID = 0
 
 fun NotificationManager.sendNotification(
-    //messageBody: String,
     applicationContext: Context,
     repositoryDescription: String,
     downloadState: Boolean
 ) {
 
-    val contentIntent = Intent(applicationContext, DetailActivity::class.java)
+    val actionIntent = Intent(applicationContext, DetailActivity::class.java)
     val bundle = Bundle()
     bundle.putBoolean("status", downloadState)
     bundle.putString("description", repositoryDescription)
-    contentIntent.putExtras(bundle)
+    actionIntent.putExtras(bundle)
 
+    val actionButtonPendingIntent = PendingIntent.getActivity(
+        applicationContext,
+        NOTIFICATION_ID,
+        actionIntent,
+        PendingIntent.FLAG_CANCEL_CURRENT
+    )
+
+
+    val contentIntent = Intent(applicationContext, MainActivity::class.java)
     val contentPendingIntent = PendingIntent.getActivity(
         applicationContext,
         NOTIFICATION_ID,
@@ -57,11 +66,11 @@ fun NotificationManager.sendNotification(
         .addAction(
             R.drawable.ic_baseline_cloud_download_24,
             applicationContext.getString(R.string.view_download_status),
-            contentPendingIntent
+            actionButtonPendingIntent
         )
 
 
-    notify(NOTIFICATION_ID, builder.build())
 
+    notify(NOTIFICATION_ID, builder.build())
 
 }

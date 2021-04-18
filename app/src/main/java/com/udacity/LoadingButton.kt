@@ -1,5 +1,6 @@
 package com.udacity
 
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
@@ -67,6 +68,7 @@ class LoadingButton @JvmOverloads constructor(
             duration = 3000
             interpolator = LinearInterpolator()
             repeatCount = -1
+            repeatMode = ObjectAnimator.RESTART
             addUpdateListener {
                 progress = this.animatedValue as Int
                 invalidate()
